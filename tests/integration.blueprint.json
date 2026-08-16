@@ -1,0 +1,35 @@
+{
+  "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+  "preferredVersions": {
+    "php": "8.3",
+    "wp": "latest"
+  },
+  "features": {
+    "networking": true
+  },
+  "steps": [
+    {
+      "step": "installTheme",
+      "themeData": {
+        "resource": "wordpress.org/themes",
+        "slug": "neve"
+      },
+      "options": {
+        "activate": true
+      }
+    },
+    {
+      "step": "runPHP",
+      "code": "<?php require_once '/wordpress/wp-load.php'; update_option('blogname','My WordPress'); update_option('blogdescription','Just another WordPress site'); $home=wp_insert_post(array('post_type'=>'page','post_status'=>'publish','post_title'=>'Homepage','post_name'=>'web-agency-gb-home','post_content'=>'<!-- wp:heading {\"level\":1} --><h1 class=\"wp-block-heading\">Rise and Radiate</h1><!-- /wp:heading --><!-- wp:button --><div class=\"wp-block-button\"><a class=\"wp-block-button__link\" href=\"#\">Learn More</a></div><!-- /wp:button -->')); $about=wp_insert_post(array('post_type'=>'page','post_status'=>'publish','post_title'=>'About Us','post_name'=>'web-agency-gb-about-us','post_content'=>'<h2>My Approach</h2><p>Original approach.</p><h2>Our approach</h2><p>Duplicate approach.</p>')); $contact=wp_insert_post(array('post_type'=>'page','post_status'=>'publish','post_title'=>'Contact Us','post_name'=>'web-agency-gb-contact-us','post_content'=>'<p>hello@riseandradiate.net</p><p>(+356) 77 53 50 96</p>')); update_option('show_on_front','page'); update_option('page_on_front',$home); $menu=wp_create_nav_menu('Primary'); wp_update_nav_menu_item($menu,0,array('menu-item-title'=>'Teen Coaching','menu-item-url'=>home_url('/?page_id=178'),'menu-item-status'=>'publish')); wp_update_nav_menu_item($menu,0,array('menu-item-title'=>'Adults','menu-item-url'=>home_url('/?page_id=187'),'menu-item-status'=>'publish')); set_theme_mod('nav_menu_locations',array('primary'=>$menu)); ?>"
+    },
+    {
+      "step": "activatePlugin",
+      "pluginName": "Rise & Radiate Rescue",
+      "pluginPath": "/wordpress/wp-content/plugins/rise-and-radiate-rescue/rise-and-radiate-rescue.php"
+    },
+    {
+      "step": "runPHP",
+      "code": "<?php require_once '/wordpress/wp-load.php'; $fail=array(); if ('Rise & Radiate'!==get_option('blogname')){$fail[]='site title';} $teen=get_page_by_path('teen-coaching'); if(!$teen||'publish'!==$teen->post_status){$fail[]='teen page';} $adult=get_page_by_path('adults'); if(!$adult||'publish'!==$adult->post_status){$fail[]='adult page';} $about=get_page_by_path('about'); if(!$about||false===strpos($about->post_content,'rar-about-page')){$fail[]='about page';} $contact=get_page_by_path('contact'); if(!$contact||false===strpos($contact->post_content,'mailto:hello@riseandradiate.net')||false===strpos($contact->post_content,'wa.me/35677535096')){$fail[]='contact links';} $home=get_post((int)get_option('page_on_front')); if(!$home||false===strpos($home->post_content,'/about/')){$fail[]='home link';} $privacy=get_page_by_path('privacy'); if(!$privacy||'draft'!==$privacy->post_status){$fail[]='privacy draft';} if(!get_option('rar_rescue_backup_v1')){$fail[]='backup';} if($fail){throw new Exception('Integration assertions failed: '.implode(', ',$fail));} echo 'RESCUE_INTEGRATION_OK'; ?>"
+    }
+  ]
+}

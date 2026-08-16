@@ -1,0 +1,349 @@
+:root {
+	--rar-ink: #19332f;
+	--rar-ink-soft: #36524d;
+	--rar-sage: #9db5aa;
+	--rar-sage-light: #e9f0ed;
+	--rar-sun: #b77718;
+	--rar-sun-light: #f5e6c9;
+	--rar-sand: #f7f1e7;
+	--rar-paper: #fffdf9;
+	--rar-line: rgba(25, 51, 47, 0.16);
+	--rar-shadow: 0 20px 60px rgba(25, 51, 47, 0.12);
+	--rar-radius: 1.35rem;
+}
+
+body.rar-rescue-active {
+	background: var(--rar-paper);
+	color: var(--rar-ink);
+	font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+	font-size: 18px;
+	line-height: 1.7;
+}
+
+.rar-rescue-active :where(h1, h2, h3, h4, h5, h6) {
+	color: var(--rar-ink);
+	font-family: Georgia, "Times New Roman", serif;
+	font-weight: 500;
+	letter-spacing: -0.025em;
+	line-height: 1.12;
+}
+
+.rar-rescue-active h1 {
+	font-size: clamp(2.65rem, 7vw, 5.8rem);
+}
+
+.rar-rescue-active h2 {
+	font-size: clamp(2rem, 4vw, 3.5rem);
+}
+
+.rar-rescue-active h3 {
+	font-size: clamp(1.35rem, 2.2vw, 1.8rem);
+}
+
+.rar-rescue-active a {
+	color: var(--rar-ink);
+	text-decoration-color: var(--rar-sun);
+	text-decoration-thickness: 0.1em;
+	text-underline-offset: 0.18em;
+}
+
+.rar-rescue-active a:hover {
+	color: #0d201d;
+}
+
+.rar-rescue-active :where(a, button, input, textarea, select):focus-visible {
+	outline: 3px solid var(--rar-sun);
+	outline-offset: 4px;
+}
+
+.rar-rescue-active .header {
+	background: rgba(255, 253, 249, 0.96);
+	border-bottom: 1px solid var(--rar-line);
+	box-shadow: 0 8px 30px rgba(25, 51, 47, 0.04);
+	position: sticky;
+	top: 0;
+	z-index: 100;
+}
+
+.rar-rescue-active .header-main-inner {
+	padding-block: 0.35rem;
+}
+
+.rar-rescue-active .site-logo a,
+.rar-rescue-active a.neve-site-logo {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.7rem;
+	text-decoration: none;
+}
+
+.rar-rescue-active .site-logo img,
+.rar-rescue-active a.neve-site-logo img {
+	height: 54px;
+	max-height: 54px;
+	object-fit: contain;
+	object-position: center;
+	width: 70px;
+}
+
+.rar-rescue-active .site-logo a::after,
+.rar-rescue-active a.neve-site-logo::after {
+	color: var(--rar-ink);
+	content: "Rise & Radiate";
+	font-family: Georgia, "Times New Roman", serif;
+	font-size: clamp(1.1rem, 2vw, 1.45rem);
+	font-weight: 600;
+	letter-spacing: -0.025em;
+	white-space: nowrap;
+}
+
+.rar-rescue-active .nv-title-tagline-wrap {
+	display: none;
+}
+
+.rar-rescue-active .nav-ul > li > .wrap > a,
+.rar-rescue-active .primary-menu-ul a {
+	color: var(--rar-ink);
+	font-size: 0.82rem;
+	font-weight: 700;
+	letter-spacing: 0.055em;
+	text-decoration: none;
+	text-transform: uppercase;
+}
+
+.rar-rescue-active .nav-ul > li > .wrap > a:hover,
+.rar-rescue-active .nav-ul .current-menu-item > .wrap > a {
+	color: var(--rar-sun);
+}
+
+.rar-rescue-active .wp-block-button__link,
+.rar-rescue-active .button,
+.rar-rescue-active button[type="submit"] {
+	background: var(--rar-ink);
+	border: 2px solid var(--rar-ink);
+	border-radius: 999px;
+	box-shadow: none;
+	color: #fff;
+	font-size: 0.92rem;
+	font-weight: 700;
+	letter-spacing: 0.02em;
+	min-height: 3.15rem;
+	padding: 0.78rem 1.45rem;
+	text-decoration: none;
+	transition: background-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.rar-rescue-active .wp-block-button__link:hover,
+.rar-rescue-active .button:hover,
+.rar-rescue-active button[type="submit"]:hover {
+	background: transparent;
+	color: var(--rar-ink);
+	transform: translateY(-2px);
+}
+
+.rar-rescue-active .neve-main {
+	background: var(--rar-paper);
+}
+
+.rar-rescue-active .nv-page-title-wrap,
+.rar-rescue-active .nv-single-page-wrap {
+	margin-top: 0;
+}
+
+.rar-rescue-active .rar-page-hero {
+	background:
+		linear-gradient(105deg, rgba(247, 241, 231, 0.96), rgba(247, 241, 231, 0.78)),
+		var(--rar-ocean-image) center 62% / cover;
+	margin-bottom: clamp(3rem, 7vw, 6rem);
+	padding: clamp(4.5rem, 10vw, 9rem) max(1.5rem, calc((100vw - 1120px) / 2));
+}
+
+.rar-rescue-active .rar-page-hero > * {
+	margin-left: 0;
+	max-width: 850px;
+}
+
+.rar-rescue-active .rar-page-hero h1 {
+	margin-block: 0.25em;
+}
+
+.rar-rescue-active .rar-eyebrow {
+	color: var(--rar-sun);
+	font-size: 0.8rem;
+	font-weight: 800;
+	letter-spacing: 0.16em;
+	margin-bottom: 0.8rem;
+	text-transform: uppercase;
+}
+
+.rar-rescue-active .rar-content-section {
+	padding-block: clamp(2rem, 5vw, 4.5rem);
+}
+
+.rar-rescue-active .rar-content-section :where(p, li) {
+	max-width: 760px;
+}
+
+.rar-rescue-active .rar-content-section li,
+.rar-rescue-active .rar-service-columns li {
+	margin-bottom: 0.45rem;
+	padding-left: 0.35rem;
+}
+
+.rar-rescue-active .rar-content-section li::marker,
+.rar-rescue-active .rar-service-columns li::marker {
+	color: var(--rar-sun);
+}
+
+.rar-rescue-active .rar-service-columns {
+	gap: clamp(1.4rem, 4vw, 3rem);
+	margin-bottom: clamp(4rem, 8vw, 7rem);
+	margin-top: clamp(3rem, 6vw, 5rem);
+}
+
+.rar-rescue-active .rar-service-columns > .wp-block-column {
+	background: #fff;
+	border: 1px solid var(--rar-line);
+	border-radius: var(--rar-radius);
+	box-shadow: var(--rar-shadow);
+	padding: clamp(1.6rem, 4vw, 3rem);
+}
+
+.rar-rescue-active .rar-callout {
+	background: var(--rar-ink);
+	border-radius: var(--rar-radius);
+	box-shadow: var(--rar-shadow);
+	color: #fff;
+	margin-bottom: clamp(4rem, 8vw, 7rem);
+	margin-top: clamp(3rem, 7vw, 6rem);
+	padding: clamp(2rem, 5vw, 4rem);
+}
+
+.rar-rescue-active .rar-callout :where(h2, p) {
+	color: #fff;
+}
+
+.rar-rescue-active .rar-callout .wp-block-button__link {
+	background: var(--rar-sun-light);
+	border-color: var(--rar-sun-light);
+	color: var(--rar-ink);
+}
+
+.rar-rescue-active .rar-callout .wp-block-button__link:hover {
+	background: transparent;
+	color: #fff;
+}
+
+.rar-rescue-active.home .nv-content-wrap > figure:first-child {
+	margin: clamp(3rem, 8vw, 6.5rem) auto 0.8rem;
+	max-width: 150px;
+}
+
+.rar-rescue-active.home .nv-content-wrap > h1:first-of-type {
+	font-size: clamp(3rem, 8vw, 6.8rem);
+	margin-bottom: 0.25em;
+	text-align: center;
+}
+
+.rar-rescue-active.home .nv-content-wrap > h1:first-of-type + p,
+.rar-rescue-active.home .nv-content-wrap > h1:first-of-type + p + p {
+	font-size: clamp(1.05rem, 2.2vw, 1.35rem);
+	margin-inline: auto;
+	max-width: 800px;
+	text-align: center;
+}
+
+.rar-rescue-active.home .nv-content-wrap > .wp-block-buttons:first-of-type,
+.rar-rescue-active.home .nv-content-wrap > .wp-block-button:first-of-type {
+	justify-content: center;
+}
+
+.rar-rescue-active.home .wp-block-columns {
+	gap: 1.25rem;
+}
+
+.rar-rescue-active.home .wp-block-columns > .wp-block-column {
+	border-radius: var(--rar-radius);
+}
+
+.rar-rescue-active .wp-block-quote {
+	background: var(--rar-sage-light);
+	border: 0;
+	border-radius: var(--rar-radius);
+	padding: clamp(1.5rem, 4vw, 2.6rem);
+}
+
+.rar-rescue-active input:not([type="checkbox"]):not([type="radio"]),
+.rar-rescue-active textarea,
+.rar-rescue-active select {
+	background: #fff;
+	border: 1px solid rgba(25, 51, 47, 0.25);
+	border-radius: 0.75rem;
+	color: var(--rar-ink);
+	font: inherit;
+	padding: 0.85rem 1rem;
+}
+
+.rar-rescue-active textarea {
+	min-height: 150px;
+}
+
+.rar-rescue-active .site-footer {
+	background: var(--rar-ink);
+	border-top: 0;
+	color: rgba(255, 255, 255, 0.86);
+	margin-top: clamp(3rem, 8vw, 7rem);
+}
+
+.rar-rescue-active .site-footer :where(p, a) {
+	color: inherit;
+}
+
+.rar-rescue-active .site-footer a[href*="YOURFACEBOOKPAGE"] {
+	display: none !important;
+}
+
+.rar-rescue-active .site-footer img[src*="flaticon.com"] {
+	filter: brightness(0) invert(1);
+	opacity: 0.82;
+}
+
+@media (max-width: 780px) {
+	body.rar-rescue-active {
+		font-size: 17px;
+	}
+
+	.rar-rescue-active .header {
+		position: relative;
+	}
+
+	.rar-rescue-active .site-logo img,
+	.rar-rescue-active a.neve-site-logo img {
+		height: 44px;
+		width: 56px;
+	}
+
+	.rar-rescue-active .site-logo a::after,
+	.rar-rescue-active a.neve-site-logo::after {
+		font-size: 1.02rem;
+	}
+
+	.rar-rescue-active .rar-page-hero {
+		background-position: center 75%;
+		padding-block: 4rem;
+	}
+
+	.rar-rescue-active.home .nv-content-wrap > figure:first-child {
+		margin-top: 2.4rem;
+		max-width: 110px;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.rar-rescue-active *,
+	.rar-rescue-active *::before,
+	.rar-rescue-active *::after {
+		scroll-behavior: auto !important;
+		transition-duration: 0.01ms !important;
+	}
+}
