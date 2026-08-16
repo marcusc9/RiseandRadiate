@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 96" role="img" aria-labelledby="title">
+  <title id="title">Rise &amp; Radiate</title>
+  <g fill="none" stroke="#b87a22" stroke-linecap="round" stroke-linejoin="round" stroke-width="4.2">
+    <path d="M36 68a28 28 0 0 1 56 0"/>
+    <path d="M12 68h104"/>
+    <path d="M13 82c9-5 15 5 24 0s15-5 24 0 15 5 24 0 15-5 30 0"/>
+    <path d="M64 39V8M56 40l-5-29M48 43L38 16M41 48L27 24M36 54L19 36M34 61L14 50M72 40l5-29M80 43l10-27M87 48l14-24M92 54l17-18M94 61l20-11"/>
+  </g>
+</svg>

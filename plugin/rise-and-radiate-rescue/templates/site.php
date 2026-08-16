@@ -9,8 +9,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$navigation = rar_redesign_navigation();
-$mark_url   = plugins_url( 'assets/images/rise-radiate-mark.png', RAR_RESCUE_FILE );
+$navigation  = rar_redesign_navigation();
+$mark_url    = plugins_url( 'assets/images/rise-radiate-mark.svg', RAR_RESCUE_FILE );
 $current_url = get_permalink();
 ?>
 <!doctype html>
@@ -19,6 +19,7 @@ $current_url = get_permalink();
 	<meta charset="<?php bloginfo( 'charset' ); ?>">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<?php wp_head(); ?>
+	<link rel="icon" href="<?php echo esc_url( $mark_url ); ?>" type="image/svg+xml" sizes="any">
 </head>
 <body <?php body_class( 'rar-redesign' ); ?>>
 <?php wp_body_open(); ?>

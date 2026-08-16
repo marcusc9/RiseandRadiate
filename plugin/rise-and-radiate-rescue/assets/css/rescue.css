@@ -390,19 +390,22 @@ body.rar-nav-open {
   outline: 0;
 }
 
-.rar-service h2 {
+body.rar-redesign .rar-service h2 {
   font-size: clamp(1.8rem, 2.5vw, 2.7rem);
   letter-spacing: -0.045em;
-  margin: 72px 0 22px;
+  margin: 0 0 22px;
+  min-height: 44px;
 }
 
-.rar-service:nth-child(2) h2 {
+body.rar-redesign .rar-service:nth-child(2) h2 {
   font-size: clamp(1.8rem, 2.35vw, 2.5rem);
 }
 
 .rar-service p {
   font-size: 0.97rem;
   line-height: 1.7;
+  margin-bottom: 0;
+  min-height: calc(1.7em * 6);
 }
 
 .rar-text-link,
@@ -836,6 +839,15 @@ body.rar-redesign .rar-contact-form .rar-form-field textarea:focus {
   .rar-service:nth-child(n + 3) {
     padding-top: 30px;
   }
+
+  body.rar-redesign .rar-service h2,
+  body.rar-redesign .rar-service:nth-child(2) h2 {
+    font-size: clamp(2.3rem, 4.5vw, 4.4rem);
+  }
+
+  .rar-service p {
+    min-height: calc(1.7em * 4);
+  }
 }
 
 @media (max-width: 900px) {
@@ -985,6 +997,14 @@ body.rar-redesign .rar-contact-form .rar-form-field textarea:focus {
 
   .rar-service:last-child {
     border-bottom: 1px solid var(--rar-line);
+  }
+
+  body.rar-redesign .rar-service h2 {
+    min-height: 0;
+  }
+
+  .rar-service p {
+    min-height: 0;
   }
 
   .rar-three-up,

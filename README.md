@@ -6,7 +6,7 @@ The upgrade is packaged as the **Rise & Radiate Rescue** plugin. Activating it:
 
 - rebuilds the complete public site without replacing WordPress;
 - preserves the original public wording and existing site imagery;
-- provides Home, About, Parent Support, Teen Coaching, Adults, Organisations, and Contact pages;
+- provides Home, About, Parent Support, Organisations, and Contact navigation, with Teens and Adults clearly marked as coming soon;
 - supplies a theme-independent responsive header, navigation, page system, and footer;
 - processes contact enquiries through the normal WordPress mail transport;
 - repairs legacy URLs and preserves the original pre-upgrade content;

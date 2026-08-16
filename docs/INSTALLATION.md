@@ -6,6 +6,14 @@
 2. Take a fresh hosting backup of both the files and database.
 3. If the host provides staging, install the upgrade there first.
 
+## Confirm the WordPress setup
+
+Open the WordPress dashboard and look for **Plugins → Add New Plugin → Upload Plugin**.
+
+- If that option is present, this upgrade can be installed.
+- If the site is on the free WordPress.com plan, custom plugins cannot be uploaded. Upgrade to any paid WordPress.com plan or move the site to ordinary WordPress hosting first.
+- The WordPress software itself is free and fully compatible with this upgrade when used with normal hosting.
+
 ## Install the upgrade
 
 1. Sign in to WordPress as an Administrator.
@@ -21,15 +29,14 @@ Check these pages in a private browser window and on a phone:
 - Home
 - About
 - Parent Support
-- Teen Coaching
-- Adults
 - Organisations & Employers
 - Contact
 
 Confirm that:
 
 - the header and mobile navigation work on every page;
-- all seven pages open without a not-found page;
+- all five navigation links open without a not-found page;
+- Teens and Adults appear as non-clicking **Coming soon** cards on Home;
 - the Learn More button opens About;
 - the Contact email and WhatsApp number are clickable;
 - the public wording matches the existing Rise & Radiate copy; and

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Rise & Radiate Rescue
  * Description: Rebuilds the current Rise & Radiate site as a complete, editable WordPress experience while preserving its original copy.
- * Version: 1.0.0
+ * Version: 1.1.0
  * Requires at least: 6.4
  * Requires PHP: 7.4
  * Author: Marcus Cheong
@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'RAR_RESCUE_VERSION', '1.0.0' );
+define( 'RAR_RESCUE_VERSION', '1.1.0' );
 define( 'RAR_RESCUE_FILE', __FILE__ );
 define( 'RAR_RESCUE_DIR', plugin_dir_path( __FILE__ ) );
 
