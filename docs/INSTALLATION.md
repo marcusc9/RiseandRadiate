@@ -19,28 +19,24 @@
 Check these pages in a private browser window and on a phone:
 
 - Home
-- About Aoife
+- About
 - Parent Support
 - Teen Coaching
-- Adult Coaching
+- Adults
 - Organisations & Employers
 - Contact
 
 Confirm that:
 
-- the header shows the Rise & Radiate identity, not “Agency”;
-- Teen Coaching and Adult Coaching no longer return a not-found page;
-- the Learn More button opens About Aoife;
+- the header and mobile navigation work on every page;
+- all seven pages open without a not-found page;
+- the Learn More button opens About;
 - the Contact email and WhatsApp number are clickable;
-- there is no placeholder Facebook link; and
+- the public wording matches the existing Rise & Radiate copy; and
 - the form still submits to the expected inbox.
-
-## Important privacy step
-
-The plugin creates **Privacy Notice — Draft** but does not publish it. Aoife should confirm every service that receives information from the website—hosting, email, forms, analytics, booking, payment, and messaging—and have the final wording reviewed before publishing it.
 
 ## Recovery
 
 The first pre-upgrade values are stored in the WordPress database under `rar_rescue_backup_v1`. Existing pages also receive a WordPress revision before replacement. Use the page’s **Revisions** panel to restore earlier content if necessary.
 
-Deactivating the plugin removes the styling and redirects, but intentionally does not delete or roll back published pages. Restore page revisions or the hosting backup if a full rollback is required.
+Deactivating the plugin removes the rebuilt site shell, styling, redirects, and contact-form processing, but intentionally does not delete or roll back published pages. Restore page revisions or the hosting backup if a full rollback is required.

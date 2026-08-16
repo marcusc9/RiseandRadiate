@@ -12,12 +12,8 @@ Aoife only needs the **Pages** section for normal changes.
 
 ## Change an image
 
-1. Open the page and select the image.
-2. Choose **Replace**.
-3. Upload or select the new image.
-4. Add a short description in **Alternative text** when the image communicates useful information.
-5. Preview and update the page.
+The large site images are part of the installed Rise & Radiate upgrade. Ask Marcus to replace one so that its crop, contrast, mobile layout, and loading size can be checked properly.
 
 ## Safe rule
 
-Edit words and images, but leave the site header, theme, plugins, and block structure alone unless Marcus is helping. If something goes wrong, stop and use the page’s **Revisions** panel instead of repeatedly saving.
+Edit words, but leave the images, site header, theme, plugins, and page structure alone unless Marcus is helping. If something goes wrong, stop and use the page’s **Revisions** panel instead of repeatedly saving.

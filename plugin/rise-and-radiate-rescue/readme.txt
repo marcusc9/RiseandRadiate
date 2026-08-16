@@ -2,17 +2,15 @@
 Contributors: marcuscheong
 Requires at least: 6.4
 Requires PHP: 7.4
-Stable tag: 0.1.0
+Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-A focused repair and visual refresh for the Rise & Radiate WordPress site.
+A complete, editable rebuild of the Rise & Radiate WordPress site.
 
 == Description ==
 
-This site-specific plugin repairs the current Rise & Radiate installation. It preserves original settings and page content, restores missing service pages, repairs navigation, replaces template residue, and adds a scoped visual refresh.
-
-The included privacy page is created as a draft and must be reviewed before publication.
+This site-specific plugin preserves the existing WordPress installation while rebuilding its public pages, navigation, contact experience, and visual system. The public wording comes from the original Rise & Radiate site.
 
 == Installation ==
 
@@ -23,6 +21,9 @@ The included privacy page is created as a draft and must be reviewed before publ
 5. Test the site and contact form on desktop and mobile.
 
 == Changelog ==
+
+= 1.0.0 =
+* Complete responsive rebuild with seven public pages, a theme-independent site shell, and a working contact form.
 
 = 0.1.0 =
 * Initial rescue release.

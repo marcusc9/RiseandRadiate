@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: Rise & Radiate Rescue
- * Description: Repairs the current Rise & Radiate site, restores missing service pages, cleans template residue, and applies a light visual refresh.
- * Version: 0.1.0
+ * Description: Rebuilds the current Rise & Radiate site as a complete, editable WordPress experience while preserving its original copy.
+ * Version: 1.0.0
  * Requires at least: 6.4
  * Requires PHP: 7.4
  * Author: Marcus Cheong
@@ -14,14 +14,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'RAR_RESCUE_VERSION', '0.1.0' );
+define( 'RAR_RESCUE_VERSION', '1.0.0' );
 define( 'RAR_RESCUE_FILE', __FILE__ );
 define( 'RAR_RESCUE_DIR', plugin_dir_path( __FILE__ ) );
+
+require_once RAR_RESCUE_DIR . 'includes/redesign.php';
 
 register_activation_hook( __FILE__, 'rar_rescue_activate' );
 
 /**
- * Apply the rescue when the plugin is activated.
+ * Preserve the current site, install the rebuild, and report completion.
  */
 function rar_rescue_activate() {
 	rar_rescue_apply();
@@ -30,7 +32,7 @@ function rar_rescue_activate() {
 }
 
 /**
- * Run every idempotent rescue operation and retain a short report.
+ * Run every idempotent installation operation.
  *
  * @return array<string, string>
  */
@@ -40,16 +42,12 @@ function rar_rescue_apply() {
 	rar_rescue_capture_site_backup();
 	rar_rescue_fix_site_identity( $report );
 	rar_rescue_clean_legacy_slugs( $report );
-
-	$teen_id  = rar_rescue_upsert_service_page( 'teen-coaching', 'Teen Coaching', rar_rescue_teen_content(), $report );
-	$adult_id = rar_rescue_upsert_service_page( 'adults', 'Adult Coaching', rar_rescue_adult_content(), $report );
-
-	rar_rescue_refresh_about_page( $report );
-	rar_rescue_repair_home_links( $report );
-	rar_rescue_link_contact_details( $report );
-	rar_rescue_repair_navigation( $teen_id, $adult_id, $report );
 	rar_rescue_install_brand_mark( $report );
-	rar_rescue_create_privacy_draft( $report );
+
+	if ( function_exists( 'rar_redesign_apply' ) ) {
+		rar_redesign_apply();
+		$report['site'] = 'Installed the complete Rise & Radiate page system.';
+	}
 
 	update_option(
 		'rar_rescue_last_report',
@@ -64,7 +62,7 @@ function rar_rescue_apply() {
 }
 
 /**
- * Preserve the original global settings once.
+ * Preserve global settings once, before the first change.
  */
 function rar_rescue_capture_site_backup() {
 	if ( get_option( 'rar_rescue_backup_v1' ) ) {
@@ -85,7 +83,7 @@ function rar_rescue_capture_site_backup() {
 }
 
 /**
- * Save the original state of a page before the first modification.
+ * Preserve one page before its first update.
  *
  * @param int $post_id Page ID.
  */
@@ -115,7 +113,7 @@ function rar_rescue_backup_page( $post_id ) {
 }
 
 /**
- * Replace only obvious template-default identity values.
+ * Replace only obvious starter identity values.
  *
  * @param array<string, string> $report Report items.
  */
@@ -128,19 +126,19 @@ function rar_rescue_fix_site_identity( &$report ) {
 
 	$current_description = trim( (string) get_option( 'blogdescription' ) );
 	if ( '' === $current_description || 'just another wordpress site' === strtolower( $current_description ) ) {
-		update_option( 'blogdescription', 'Helping families grow with confidence, connection, and purpose.' );
-		$report['tagline'] = 'Added a clear site tagline.';
+		update_option( 'blogdescription', 'Supporting families to grow with confidence, connection, and purpose.' );
+		$report['tagline'] = 'Set the published Rise & Radiate tagline.';
 	}
 }
 
 /**
- * Rename demo-template slugs while retaining WordPress revisions and old-slug redirects.
+ * Clean the two demo-template slugs while retaining page revisions.
  *
  * @param array<string, string> $report Report items.
  */
 function rar_rescue_clean_legacy_slugs( &$report ) {
 	$changes = array(
-		'web-agency-gb-about-us'  => 'about',
+		'web-agency-gb-about-us'   => 'about',
 		'web-agency-gb-contact-us' => 'contact',
 	);
 
@@ -171,252 +169,7 @@ function rar_rescue_clean_legacy_slugs( &$report ) {
 }
 
 /**
- * Find a page by slug regardless of its current status.
- *
- * @param string $slug Page slug.
- * @return WP_Post|null
- */
-function rar_rescue_find_page_any_status( $slug ) {
-	$posts = get_posts(
-		array(
-			'name'             => $slug,
-			'post_type'        => 'page',
-			'post_status'      => array( 'publish', 'future', 'draft', 'pending', 'private', 'trash' ),
-			'numberposts'      => 1,
-			'suppress_filters' => true,
-		)
-	);
-
-	return $posts ? $posts[0] : null;
-}
-
-/**
- * Restore or create a missing service page.
- *
- * @param string                $slug    Page slug.
- * @param string                $title   Page title.
- * @param string                $content Block content.
- * @param array<string, string> $report  Report items.
- * @return int
- */
-function rar_rescue_upsert_service_page( $slug, $title, $content, &$report ) {
-	$page = rar_rescue_find_page_any_status( $slug );
-
-	if ( $page instanceof WP_Post ) {
-		rar_rescue_backup_page( $page->ID );
-		if ( 'trash' === $page->post_status ) {
-			wp_untrash_post( $page->ID );
-		}
-		wp_save_post_revision( $page->ID );
-		$result = wp_update_post(
-			wp_slash(
-				array(
-					'ID'           => $page->ID,
-					'post_title'   => $title,
-					'post_name'    => $slug,
-					'post_content' => $content,
-					'post_status'  => 'publish',
-				)
-			),
-			true
-		);
-	} else {
-		$result = wp_insert_post(
-			wp_slash(
-				array(
-					'post_type'    => 'page',
-					'post_title'   => $title,
-					'post_name'    => $slug,
-					'post_content' => $content,
-					'post_status'  => 'publish',
-				)
-			),
-			true
-		);
-	}
-
-	if ( is_wp_error( $result ) ) {
-		$report[ 'page_' . $slug ] = 'Could not create the service page: ' . $result->get_error_message();
-		return 0;
-	}
-
-	$report[ 'page_' . $slug ] = sprintf( 'Published the missing %s page.', $title );
-	return (int) $result;
-}
-
-/**
- * Replace the duplicated About content with a concise, personal version.
- *
- * @param array<string, string> $report Report items.
- */
-function rar_rescue_refresh_about_page( &$report ) {
-	$page = get_page_by_path( 'about' );
-	if ( ! $page instanceof WP_Post ) {
-		return;
-	}
-
-	if ( false !== strpos( $page->post_content, 'rar-about-page' ) ) {
-		return;
-	}
-
-	rar_rescue_backup_page( $page->ID );
-	wp_save_post_revision( $page->ID );
-	$result = wp_update_post(
-		wp_slash(
-			array(
-				'ID'           => $page->ID,
-				'post_title'   => 'About Aoife',
-				'post_content' => rar_rescue_about_content(),
-			)
-		),
-		true
-	);
-
-	if ( ! is_wp_error( $result ) ) {
-		$report['about'] = 'Removed the duplicated About section and introduced Aoife clearly.';
-	}
-}
-
-/**
- * Repair the homepage dead button without replacing the existing page.
- *
- * @param array<string, string> $report Report items.
- */
-function rar_rescue_repair_home_links( &$report ) {
-	$front_page_id = (int) get_option( 'page_on_front' );
-	if ( ! $front_page_id ) {
-		$page = get_page_by_path( 'web-agency-gb-home' );
-		$front_page_id = $page instanceof WP_Post ? $page->ID : 0;
-	}
-
-	$page = $front_page_id ? get_post( $front_page_id ) : null;
-	if ( ! $page instanceof WP_Post ) {
-		return;
-	}
-
-	$about_url = esc_url( home_url( '/about/' ) );
-	$content   = str_replace( 'href="#"', 'href="' . $about_url . '"', $page->post_content );
-
-	if ( $content === $page->post_content ) {
-		return;
-	}
-
-	rar_rescue_backup_page( $page->ID );
-	wp_save_post_revision( $page->ID );
-	wp_update_post(
-		wp_slash(
-			array(
-				'ID'           => $page->ID,
-				'post_content' => $content,
-			)
-		)
-	);
-	$report['home_link'] = 'Connected the dead Learn More button to the About page.';
-}
-
-/**
- * Turn the plain contact details into useful links while preserving the form.
- *
- * @param array<string, string> $report Report items.
- */
-function rar_rescue_link_contact_details( &$report ) {
-	$page = get_page_by_path( 'contact' );
-	if ( ! $page instanceof WP_Post ) {
-		return;
-	}
-
-	$content = $page->post_content;
-	if ( false === strpos( $content, 'mailto:hello@riseandradiate.net' ) ) {
-		$content = str_replace(
-			'hello@riseandradiate.net',
-			'<a href="mailto:hello@riseandradiate.net">hello@riseandradiate.net</a>',
-			$content
-		);
-	}
-	if ( false === strpos( $content, 'wa.me/35677535096' ) ) {
-		$content = str_replace(
-			'(+356) 77 53 50 96',
-			'<a href="https://wa.me/35677535096">(+356) 77 53 50 96</a>',
-			$content
-		);
-	}
-
-	if ( $content === $page->post_content ) {
-		return;
-	}
-
-	rar_rescue_backup_page( $page->ID );
-	wp_save_post_revision( $page->ID );
-	wp_update_post(
-		wp_slash(
-			array(
-				'ID'           => $page->ID,
-				'post_content' => $content,
-			)
-		)
-	);
-	$report['contact_links'] = 'Made the email address and WhatsApp number clickable.';
-}
-
-/**
- * Point the existing menu entries at the repaired service pages.
- *
- * @param int                   $teen_id  Teen page ID.
- * @param int                   $adult_id Adult page ID.
- * @param array<string, string> $report   Report items.
- */
-function rar_rescue_repair_navigation( $teen_id, $adult_id, &$report ) {
-	$targets = array(
-		'teen coaching' => $teen_id,
-		'adults'        => $adult_id,
-		'adult coaching' => $adult_id,
-	);
-	$updated = 0;
-
-	foreach ( wp_get_nav_menus() as $menu ) {
-		$items = wp_get_nav_menu_items( $menu->term_id );
-		if ( ! is_array( $items ) ) {
-			continue;
-		}
-
-		foreach ( $items as $item ) {
-			$key = strtolower( trim( wp_strip_all_tags( $item->title ) ) );
-			if ( empty( $targets[ $key ] ) ) {
-				continue;
-			}
-
-			$result = wp_update_nav_menu_item(
-				$menu->term_id,
-				$item->ID,
-				array(
-					'menu-item-title'      => $item->title,
-					'menu-item-object-id'  => $targets[ $key ],
-					'menu-item-object'     => 'page',
-					'menu-item-type'       => 'post_type',
-					'menu-item-status'     => 'publish',
-					'menu-item-position'   => $item->menu_order,
-					'menu-item-parent-id'  => $item->menu_item_parent,
-					'menu-item-attr-title' => $item->attr_title,
-					'menu-item-target'     => $item->target,
-					'menu-item-classes'    => implode( ' ', (array) $item->classes ),
-					'menu-item-xfn'        => $item->xfn,
-					'menu-item-description'=> $item->description,
-				)
-			);
-
-			if ( ! is_wp_error( $result ) ) {
-				++$updated;
-			}
-		}
-	}
-
-	if ( $updated ) {
-		$report['navigation'] = sprintf( 'Repaired %d broken service navigation links.', $updated );
-	}
-}
-
-/**
- * Import the existing Rise & Radiate brand mark and replace the template logo.
+ * Import the site's existing brand mark for normal WordPress theme fallbacks.
  *
  * @param array<string, string> $report Report items.
  */
@@ -432,17 +185,22 @@ function rar_rescue_install_brand_mark( &$report ) {
 		return;
 	}
 
-	$upload = wp_upload_bits( 'rise-radiate-mark.png', null, file_get_contents( $source ) );
-	if ( ! empty( $upload['error'] ) ) {
-		$report['logo'] = 'The brand mark could not be imported: ' . $upload['error'];
+	$contents = file_get_contents( $source );
+	if ( false === $contents ) {
 		return;
 	}
 
-	$filetype = wp_check_filetype( $upload['file'] );
+	$upload = wp_upload_bits( 'rise-radiate-mark.png', null, $contents );
+	if ( ! empty( $upload['error'] ) ) {
+		$report['logo'] = 'The Rise & Radiate mark could not be imported.';
+		return;
+	}
+
+	$filetype      = wp_check_filetype( $upload['file'] );
 	$attachment_id = wp_insert_attachment(
 		array(
 			'post_mime_type' => $filetype['type'],
-			'post_title'     => 'Rise & Radiate brand mark',
+			'post_title'     => 'Rise & Radiate',
 			'post_content'   => '',
 			'post_status'    => 'inherit',
 		),
@@ -459,40 +217,11 @@ function rar_rescue_install_brand_mark( &$report ) {
 	update_post_meta( $attachment_id, '_wp_attachment_image_alt', 'Rise & Radiate' );
 	update_option( 'rar_rescue_brand_attachment_id', $attachment_id, false );
 	set_theme_mod( 'custom_logo', $attachment_id );
-	$report['logo'] = 'Replaced the Agency template logo with the Rise & Radiate mark.';
+	$report['logo'] = 'Installed the existing Rise & Radiate mark.';
 }
 
 /**
- * Create an unpublished privacy starter for professional review.
- *
- * @param array<string, string> $report Report items.
- */
-function rar_rescue_create_privacy_draft( &$report ) {
-	if ( get_page_by_path( 'privacy' ) || get_page_by_path( 'privacy-policy' ) ) {
-		return;
-	}
-
-	$page_id = wp_insert_post(
-		wp_slash(
-			array(
-				'post_type'    => 'page',
-				'post_title'   => 'Privacy Notice — Draft',
-				'post_name'    => 'privacy',
-				'post_content' => rar_rescue_privacy_draft_content(),
-				'post_status'  => 'draft',
-			)
-		),
-		true
-	);
-
-	if ( ! is_wp_error( $page_id ) ) {
-		update_option( 'wp_page_for_privacy_policy', (int) $page_id );
-		$report['privacy'] = 'Created an unpublished privacy-notice draft for review.';
-	}
-}
-
-/**
- * Redirect legacy numeric URLs if WordPress still receives them.
+ * Redirect the two broken numeric service links still used by the old site.
  */
 function rar_rescue_legacy_redirects() {
 	if ( ! is_404() ) {
@@ -516,7 +245,7 @@ function rar_rescue_legacy_redirects() {
 add_action( 'template_redirect', 'rar_rescue_legacy_redirects' );
 
 /**
- * Add a concise homepage description when no SEO plugin is already responsible.
+ * Provide the original homepage description when no SEO plugin owns it.
  */
 function rar_rescue_meta_description() {
 	if ( ! is_front_page() ) {
@@ -527,38 +256,26 @@ function rar_rescue_meta_description() {
 		return;
 	}
 
-	echo '<meta name="description" content="' . esc_attr( 'Practical, compassionate coaching and education for parents, teenagers, adults, and organisations.' ) . '">' . "\n";
+	echo '<meta name="description" content="' . esc_attr( 'Supporting families to grow with confidence, connection, and purpose.' ) . '">' . "\n";
 }
 add_action( 'wp_head', 'rar_rescue_meta_description', 1 );
 
 /**
- * Scope the rescue stylesheet and provide its portable image URL.
+ * Load the site stylesheet.
  */
 function rar_rescue_front_assets() {
+	if ( ! function_exists( 'rar_redesign_is_site_page' ) || ! rar_redesign_is_site_page() ) {
+		return;
+	}
+
 	wp_enqueue_style(
 		'rar-rescue',
 		plugins_url( 'assets/css/rescue.css', RAR_RESCUE_FILE ),
 		array(),
 		RAR_RESCUE_VERSION
 	);
-	wp_add_inline_style(
-		'rar-rescue',
-		':root{--rar-ocean-image:url("' . esc_url( plugins_url( 'assets/images/family-connection.jpg', RAR_RESCUE_FILE ) ) . '");}'
-	);
 }
 add_action( 'wp_enqueue_scripts', 'rar_rescue_front_assets', 20 );
-
-/**
- * Add a body class so the CSS remains isolated.
- *
- * @param string[] $classes Existing body classes.
- * @return string[]
- */
-function rar_rescue_body_class( $classes ) {
-	$classes[] = 'rar-rescue-active';
-	return $classes;
-}
-add_filter( 'body_class', 'rar_rescue_body_class' );
 
 /**
  * Show a one-time completion notice.
@@ -567,6 +284,7 @@ function rar_rescue_activation_notice() {
 	if ( ! get_transient( 'rar_rescue_activation_notice' ) || ! current_user_can( 'manage_options' ) ) {
 		return;
 	}
+
 	delete_transient( 'rar_rescue_activation_notice' );
 	?>
 	<div class="notice notice-success is-dismissible">
@@ -577,7 +295,7 @@ function rar_rescue_activation_notice() {
 add_action( 'admin_notices', 'rar_rescue_activation_notice' );
 
 /**
- * Register a small status page for Marcus and Aoife.
+ * Register the installation status page.
  */
 function rar_rescue_admin_menu() {
 	add_management_page(
@@ -591,12 +309,13 @@ function rar_rescue_admin_menu() {
 add_action( 'admin_menu', 'rar_rescue_admin_menu' );
 
 /**
- * Re-run the repair from the status page.
+ * Re-run the installation from the status page.
  */
 function rar_rescue_admin_run() {
 	if ( ! current_user_can( 'manage_options' ) ) {
 		wp_die( esc_html__( 'You do not have permission to run this repair.', 'rise-and-radiate-rescue' ) );
 	}
+
 	check_admin_referer( 'rar_rescue_run' );
 	rar_rescue_apply();
 	flush_rewrite_rules();
@@ -613,10 +332,10 @@ function rar_rescue_render_admin_page() {
 	?>
 	<div class="wrap">
 		<h1><?php esc_html_e( 'Rise & Radiate Rescue', 'rise-and-radiate-rescue' ); ?></h1>
-		<p><?php esc_html_e( 'This focused upgrade repairs the existing site. Original page content was saved before the first change, and WordPress revisions were created before replacements.', 'rise-and-radiate-rescue' ); ?></p>
+		<p><?php esc_html_e( 'The complete public site is installed. Original page content and global settings were saved before the first change.', 'rise-and-radiate-rescue' ); ?></p>
 
 		<?php if ( ! empty( $_GET['updated'] ) ) : // phpcs:ignore WordPress.Security.NonceVerification.Recommended ?>
-			<div class="notice notice-success inline"><p><?php esc_html_e( 'The rescue checks were run again.', 'rise-and-radiate-rescue' ); ?></p></div>
+			<div class="notice notice-success inline"><p><?php esc_html_e( 'The site installation was run again.', 'rise-and-radiate-rescue' ); ?></p></div>
 		<?php endif; ?>
 
 		<h2><?php esc_html_e( 'Latest report', 'rise-and-radiate-rescue' ); ?></h2>
@@ -630,200 +349,13 @@ function rar_rescue_render_admin_page() {
 		</ul>
 
 		<h2><?php esc_html_e( 'What Aoife can edit', 'rise-and-radiate-rescue' ); ?></h2>
-		<p><?php esc_html_e( 'Use Pages in the left-hand WordPress menu. Open a page, click the text or image, make the change, preview it, and press Update. No code is required.', 'rise-and-radiate-rescue' ); ?></p>
-		<p><strong><?php esc_html_e( 'Privacy reminder:', 'rise-and-radiate-rescue' ); ?></strong> <?php esc_html_e( 'A draft was created but intentionally left unpublished until the wording has been reviewed.', 'rise-and-radiate-rescue' ); ?></p>
+		<p><?php esc_html_e( 'Use Pages in the left-hand WordPress menu for ordinary wording changes. Preview the page before pressing Update.', 'rise-and-radiate-rescue' ); ?></p>
 
 		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 			<input type="hidden" name="action" value="rar_rescue_run">
 			<?php wp_nonce_field( 'rar_rescue_run' ); ?>
-			<?php submit_button( __( 'Run rescue checks again', 'rise-and-radiate-rescue' ), 'secondary' ); ?>
+			<?php submit_button( __( 'Run site installation again', 'rise-and-radiate-rescue' ), 'secondary' ); ?>
 		</form>
 	</div>
 	<?php
-}
-
-/**
- * About-page block content.
- *
- * @return string
- */
-function rar_rescue_about_content() {
-	$contact_url = esc_url( home_url( '/contact/' ) );
-	return <<<HTML
-<!-- wp:group {"align":"full","className":"rar-page-hero rar-about-page","layout":{"type":"constrained"}} -->
-<div class="wp-block-group alignfull rar-page-hero rar-about-page"><!-- wp:paragraph {"className":"rar-eyebrow"} -->
-<p class="rar-eyebrow">About Rise &amp; Radiate</p>
-<!-- /wp:paragraph -->
-<!-- wp:heading {"level":1} -->
-<h1 class="wp-block-heading">Support that begins with dignity, connection, and possibility.</h1>
-<!-- /wp:heading -->
-<!-- wp:paragraph {"fontSize":"large"} -->
-<p class="has-large-font-size">Rise &amp; Radiate is led by Aoife, a Certified Positive Discipline Parent Educator who supports people to make practical, lasting changes without judgement or pressure to be perfect.</p>
-<!-- /wp:paragraph --></div>
-<!-- /wp:group -->
-
-<!-- wp:group {"className":"rar-content-section","layout":{"type":"constrained"}} -->
-<div class="wp-block-group rar-content-section"><!-- wp:heading -->
-<h2 class="wp-block-heading">A calm, practical approach</h2>
-<!-- /wp:heading -->
-<!-- wp:paragraph -->
-<p>Parenting and family life can be deeply meaningful and deeply challenging. Aoife helps parents move away from repeated conflict, shouting, or uncertainty and towards relationships built on connection, mutual respect, and trust.</p>
-<!-- /wp:paragraph -->
-<!-- wp:list -->
-<ul><li>Understand the needs underneath behaviour</li><li>Set boundaries that are both kind and firm</li><li>Build cooperation through connection rather than control</li><li>Use realistic tools in everyday family situations</li></ul>
-<!-- /wp:list -->
-<!-- wp:paragraph -->
-<p>This is not about perfect parenting. It is about creating something sustainable, respectful, and real for your family.</p>
-<!-- /wp:paragraph --></div>
-<!-- /wp:group -->
-
-<!-- wp:group {"align":"wide","className":"rar-callout","layout":{"type":"constrained"}} -->
-<div class="wp-block-group alignwide rar-callout"><!-- wp:heading {"level":2} -->
-<h2 class="wp-block-heading">Wondering whether this support is right for you?</h2>
-<!-- /wp:heading -->
-<!-- wp:paragraph -->
-<p>You do not need to know exactly what you need before getting in touch.</p>
-<!-- /wp:paragraph -->
-<!-- wp:buttons -->
-<div class="wp-block-buttons"><!-- wp:button -->
-<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="{$contact_url}">Talk to Aoife</a></div>
-<!-- /wp:button --></div>
-<!-- /wp:buttons --></div>
-<!-- /wp:group -->
-HTML;
-}
-
-/**
- * Teen-coaching page block content.
- *
- * @return string
- */
-function rar_rescue_teen_content() {
-	$contact_url = esc_url( add_query_arg( 'service', 'teen-coaching', home_url( '/contact/' ) ) );
-	return <<<HTML
-<!-- wp:group {"align":"full","className":"rar-page-hero","layout":{"type":"constrained"}} -->
-<div class="wp-block-group alignfull rar-page-hero"><!-- wp:paragraph {"className":"rar-eyebrow"} -->
-<p class="rar-eyebrow">Teen coaching</p>
-<!-- /wp:paragraph -->
-<!-- wp:heading {"level":1} -->
-<h1 class="wp-block-heading">A supportive space for confidence, resilience, and direction.</h1>
-<!-- /wp:heading -->
-<!-- wp:paragraph {"fontSize":"large"} -->
-<p class="has-large-font-size">Strengths-based coaching helps teenagers understand themselves, navigate challenges, and take thoughtful steps towards the person they want to become.</p>
-<!-- /wp:paragraph --></div>
-<!-- /wp:group -->
-
-<!-- wp:columns {"align":"wide","className":"rar-service-columns"} -->
-<div class="wp-block-columns alignwide rar-service-columns"><!-- wp:column -->
-<div class="wp-block-column"><!-- wp:heading -->
-<h2 class="wp-block-heading">Coaching can support</h2>
-<!-- /wp:heading -->
-<!-- wp:list -->
-<ul><li>confidence and self-understanding</li><li>emotional resilience</li><li>healthy decision-making</li><li>a stronger sense of identity and purpose</li></ul>
-<!-- /wp:list --></div>
-<!-- /wp:column -->
-<!-- wp:column -->
-<div class="wp-block-column"><!-- wp:heading -->
-<h2 class="wp-block-heading">A respectful first step</h2>
-<!-- /wp:heading -->
-<!-- wp:paragraph -->
-<p>Every teenager and family is different. An initial conversation helps clarify what is happening, what support may be useful, and whether coaching is an appropriate fit.</p>
-<!-- /wp:paragraph -->
-<!-- wp:buttons -->
-<div class="wp-block-buttons"><!-- wp:button -->
-<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="{$contact_url}">Enquire about teen coaching</a></div>
-<!-- /wp:button --></div>
-<!-- /wp:buttons --></div>
-<!-- /wp:column --></div>
-<!-- /wp:columns -->
-HTML;
-}
-
-/**
- * Adult-coaching page block content.
- *
- * @return string
- */
-function rar_rescue_adult_content() {
-	$contact_url = esc_url( add_query_arg( 'service', 'adult-coaching', home_url( '/contact/' ) ) );
-	return <<<HTML
-<!-- wp:group {"align":"full","className":"rar-page-hero","layout":{"type":"constrained"}} -->
-<div class="wp-block-group alignfull rar-page-hero"><!-- wp:paragraph {"className":"rar-eyebrow"} -->
-<p class="rar-eyebrow">Adult coaching</p>
-<!-- /wp:paragraph -->
-<!-- wp:heading {"level":1} -->
-<h1 class="wp-block-heading">Create more balance, clarity, and strength in everyday life.</h1>
-<!-- /wp:heading -->
-<!-- wp:paragraph {"fontSize":"large"} -->
-<p class="has-large-font-size">A thoughtful coaching space for adults and fathers navigating work, family life, relationships, or a period of change.</p>
-<!-- /wp:paragraph --></div>
-<!-- /wp:group -->
-
-<!-- wp:columns {"align":"wide","className":"rar-service-columns"} -->
-<div class="wp-block-columns alignwide rar-service-columns"><!-- wp:column -->
-<div class="wp-block-column"><!-- wp:heading -->
-<h2 class="wp-block-heading">You may be looking for</h2>
-<!-- /wp:heading -->
-<!-- wp:list -->
-<ul><li>greater calm and emotional resilience</li><li>clarity about values and priorities</li><li>healthier patterns in work and relationships</li><li>support through transition or uncertainty</li></ul>
-<!-- /wp:list --></div>
-<!-- /wp:column -->
-<!-- wp:column -->
-<div class="wp-block-column"><!-- wp:heading -->
-<h2 class="wp-block-heading">Start with a conversation</h2>
-<!-- /wp:heading -->
-<!-- wp:paragraph -->
-<p>You do not need to arrive with everything worked out. A first conversation can help clarify what you want to change and whether coaching is a good fit.</p>
-<!-- /wp:paragraph -->
-<!-- wp:buttons -->
-<div class="wp-block-buttons"><!-- wp:button -->
-<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="{$contact_url}">Enquire about adult coaching</a></div>
-<!-- /wp:button --></div>
-<!-- /wp:buttons --></div>
-<!-- /wp:column --></div>
-<!-- /wp:columns -->
-HTML;
-}
-
-/**
- * Privacy starter content that is never published automatically.
- *
- * @return string
- */
-function rar_rescue_privacy_draft_content() {
-	return <<<'HTML'
-<!-- wp:paragraph {"backgroundColor":"pale-pink","className":"rar-draft-warning"} -->
-<p class="has-pale-pink-background-color has-background rar-draft-warning"><strong>Draft for review:</strong> Do not publish this page until Aoife has confirmed the services used by the website and the wording has been checked for the business.</p>
-<!-- /wp:paragraph -->
-<!-- wp:heading -->
-<h2 class="wp-block-heading">Information we collect</h2>
-<!-- /wp:heading -->
-<!-- wp:paragraph -->
-<p>Describe the information collected through the contact form, email, telephone, WhatsApp, analytics, cookies, bookings, and any mailing list.</p>
-<!-- /wp:paragraph -->
-<!-- wp:heading -->
-<h2 class="wp-block-heading">Why we use it</h2>
-<!-- /wp:heading -->
-<!-- wp:paragraph -->
-<p>Explain the purpose and lawful basis for each use, including responding to enquiries and providing agreed services.</p>
-<!-- /wp:paragraph -->
-<!-- wp:heading -->
-<h2 class="wp-block-heading">Storage, sharing, and retention</h2>
-<!-- /wp:heading -->
-<!-- wp:paragraph -->
-<p>List the hosting, email, form, analytics, booking, payment, and communications providers involved. State how long information is retained and where it is processed.</p>
-<!-- /wp:paragraph -->
-<!-- wp:heading -->
-<h2 class="wp-block-heading">Your choices and rights</h2>
-<!-- /wp:heading -->
-<!-- wp:paragraph -->
-<p>Explain how a person can ask about, correct, delete, restrict, or obtain a copy of their information, and how to raise a concern with the relevant authority.</p>
-<!-- /wp:paragraph -->
-<!-- wp:heading -->
-<h2 class="wp-block-heading">Contact</h2>
-<!-- /wp:heading -->
-<!-- wp:paragraph -->
-<p>Email <a href="mailto:hello@riseandradiate.net">hello@riseandradiate.net</a> with questions about this notice or personal information.</p>
-<!-- /wp:paragraph -->
-HTML;
 }
