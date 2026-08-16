@@ -396,7 +396,7 @@ body.rar-nav-open {
   margin: 72px 0 22px;
 }
 
-.rar-service:last-child h2 {
+.rar-service:nth-child(2) h2 {
   font-size: clamp(1.8rem, 2.35vw, 2.5rem);
 }
 
@@ -405,7 +405,8 @@ body.rar-nav-open {
   line-height: 1.7;
 }
 
-.rar-text-link {
+.rar-text-link,
+.rar-status {
   font-size: 0.77rem;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -830,6 +831,10 @@ body.rar-redesign .rar-contact-form .rar-form-field textarea:focus {
 
   .rar-service:nth-child(2) {
     border-right: 1px solid var(--rar-line);
+  }
+
+  .rar-service:nth-child(n + 3) {
+    padding-top: 30px;
   }
 }
 

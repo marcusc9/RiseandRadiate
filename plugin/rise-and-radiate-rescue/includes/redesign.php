@@ -162,8 +162,6 @@ function rar_redesign_navigation() {
 		'Home'           => home_url( '/' ),
 		'About'          => home_url( '/about/' ),
 		'Parent Support' => home_url( '/parent-support/' ),
-		'Teen Coaching'  => home_url( '/teen-coaching/' ),
-		'Adults'         => home_url( '/adults/' ),
 		'Organisations'  => home_url( '/organisations-employers/' ),
 		'Contact'        => home_url( '/contact/' ),
 	);
@@ -271,21 +269,21 @@ function rar_redesign_home_content() {
 <p>Support for parents who want to lead with calm confidence, connection, and clarity — without harshness, guilt, or power struggles.</p>
 <span class="rar-text-link">Parent Support</span>
 </a>
-<a class="rar-service" href="/teen-coaching/">
-<h2>Teens</h2>
-<p>Strengths-based coaching to help teens build confidence, emotional resilience, and a strong sense of identity and purpose.</p>
-<span class="rar-text-link">Teen Coaching</span>
-</a>
-<a class="rar-service" href="/adults/">
-<h2>Adults</h2>
-<p>Life coaching for adults and fathers seeking balance, emotional strength, and values-aligned living in work, family, and relationships.</p>
-<span class="rar-text-link">Life Coaching</span>
-</a>
 <a class="rar-service" href="/organisations-employers/">
 <h2>Organisations</h2>
 <p>Workshops and coaching to support working parents, wellbeing, and people-centred leadership within organisations.</p>
 <span class="rar-text-link">Workplace Support</span>
 </a>
+<article class="rar-service rar-service-coming-soon">
+<h2>Teens</h2>
+<p>Strengths-based coaching to help teens build confidence, emotional resilience, and a strong sense of identity and purpose.</p>
+<span class="rar-status">Coming soon</span>
+</article>
+<article class="rar-service rar-service-coming-soon">
+<h2>Adults</h2>
+<p>Life coaching for adults and fathers seeking balance, emotional strength, and values-aligned living in work, family, and relationships.</p>
+<span class="rar-status">Coming soon</span>
+</article>
 </section>
 
 <section class="rar-section rar-approach">
